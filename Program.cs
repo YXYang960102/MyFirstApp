@@ -25,3 +25,19 @@ double heightCm = double.Parse(Console.ReadLine());
 double heightInput = heightCm / 100; // Convert cm to meters
 double bmi = weightInput / (heightInput * heightInput);
 Console.WriteLine($"Your BMI is: {bmi:F2}");
+if (bmi < 18.5)
+{
+    Console.WriteLine("You are underweight.");
+}
+else if (bmi >= 18.5 && bmi < 24.9)
+{
+    Console.WriteLine("You have a normal weight.");
+}
+else if (bmi >= 25 && bmi < 29.9)
+{
+    Console.WriteLine("You are overweight.");
+}
+else
+{
+    Console.WriteLine("You are obese.");
+}
