@@ -1,11 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "ZW2tkmVkWDM=",
+  "dgSpecHash": "wUrteMzM9sA=",
   "success": true,
   "projectFilePath": "/Users/jeremy/MyFirstApp/MyScoreApi/MyScoreApi.csproj",
   "expectedPackageFiles": [
     "/Users/jeremy/.nuget/packages/microsoft.aspnetcore.openapi/10.0.3/microsoft.aspnetcore.openapi.10.0.3.nupkg.sha512",
-    "/Users/jeremy/.nuget/packages/microsoft.openapi/2.0.0/microsoft.openapi.2.0.0.nupkg.sha512"
+    "/Users/jeremy/.nuget/packages/microsoft.netcore.app.ref/9.0.13/microsoft.netcore.app.ref.9.0.13.nupkg.sha512",
+    "/Users/jeremy/.nuget/packages/microsoft.aspnetcore.app.ref/9.0.13/microsoft.aspnetcore.app.ref.9.0.13.nupkg.sha512",
+    "/Users/jeremy/.nuget/packages/microsoft.netcore.app.host.osx-arm64/9.0.13/microsoft.netcore.app.host.osx-arm64.9.0.13.nupkg.sha512"
   ],
   "logs": []
 }
