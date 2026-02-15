@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ScoreFlow - 專業成績分析系統</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ScoreFlow - 專業成績分析儀表板</title>
     <style>
         :root {
             --sidebar-bg: #2c3e50;
@@ -15,244 +14,188 @@
             --text-main: #2d3436;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
             background: var(--main-bg);
             display: flex;
             height: 100vh;
             overflow: hidden;
+            flex-direction: row; /* 電腦版橫向排列 */
         }
 
-        /* 左側側邊欄：修正破圖問題 */
+        /* 左側側邊欄 */
         .sidebar {
             width: 320px;
             background: var(--sidebar-bg);
             color: white;
             display: flex;
             flex-direction: column;
-            padding: 25px;
-            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            transition: 0.3s;
+            z-index: 10;
         }
 
-        .sidebar h2 {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #34495e;
-            padding-bottom: 10px;
-        }
+        .sidebar h2 { font-size: 1.1rem; margin-bottom: 15px; border-bottom: 1px solid #34495e; padding-bottom: 10px; }
 
         .score-feed {
             flex: 1;
             overflow-y: auto;
-            /* 允許垂直捲動，防止破圖 */
-            padding-right: 10px;
+            padding-right: 5px;
         }
 
-        /* 紀錄項目的樣式 */
         .history-item {
-            background: #34495e;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background: #34495e; padding: 10px; border-radius: 8px; margin-bottom: 8px;
+            display: flex; justify-content: space-between; align-items: center;
             border-left: 4px solid var(--primary);
-            animation: slideIn 0.3s ease;
+            font-size: 0.9rem;
         }
 
-        /* 右側主面板：置中與可捲動 */
+        /* 右側主面板 */
         .main-content {
             flex: 1;
-            padding: 100px 40px;
+            padding: 40px 20px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 40px;
-            scroll-behavior: smooth;
+            gap: 30px;
         }
 
-        .header {
-            text-align: center;
-        }
+        .header { text-align: center; }
+        .header h1 { font-size: 2.2rem; color: var(--primary); }
 
-        .header h1 {
-            font-size: 2.8rem;
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
-
-        /* 輸入區域：支援科目與分數 */
+        /* 輸入區域：響應式彈性佈局 */
         .input-box {
             background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            display: grid;
-            grid-template-columns: 1.5fr 1fr auto auto;
-            gap: 12px;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            display: flex;
+            flex-wrap: wrap; /* 自動換行核心 */
+            gap: 10px;
             width: 100%;
-            max-width: 850px;
+            max-width: 800px;
         }
 
-        input {
-            padding: 15px;
+        .input-box input {
+            flex: 1 1 140px; /* 寬度不夠時自動縮放 */
+            padding: 12px;
             border: 2px solid #dfe6e9;
-            border-radius: 10px;
+            border-radius: 8px;
             font-size: 1rem;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        input:focus {
-            border-color: var(--primary);
+            min-width: 0;
         }
 
         .btn {
-            padding: 12px 25px;
+            flex: 1 1 auto;
+            padding: 12px 20px;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            transition: 0.3s;
-        }
-
-        .btn-add {
-            background: var(--primary);
             color: white;
+            transition: 0.2s;
+            min-width: 100px;
         }
+        .btn-add { background: var(--primary); }
+        .btn-stop { background: var(--danger); }
+        .btn-csv { background: #27ae60; }
 
-        .btn-stop {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn:hover {
-            filter: brightness(1.1);
-            transform: translateY(-2px);
-        }
-
-        /* 統計卡片漸進動畫 */
+        /* 統計卡片 */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
             width: 100%;
-            max-width: 1000px;
+            max-width: 800px;
             opacity: 0;
-            /* 預設隱藏 */
-            transform: translateY(30px);
-            /* 下移 30px */
-            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-            margin-bottom: 80px;
+            transform: translateY(20px);
+            transition: 0.6s ease-out;
         }
-
-        .stats-grid.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        .stats-grid.show { opacity: 1; transform: translateY(0); }
 
         .stat-card {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            border-top: 4px solid var(--primary);
-            text-align: center;
+            background: white; padding: 20px; border-radius: 12px;
+            text-align: center; border-top: 4px solid var(--primary);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
         }
+        .stat-label { color: #636e72; font-size: 0.85rem; margin-bottom: 5px; }
+        .stat-value { font-size: 1.6rem; font-weight: 800; }
 
-        .stat-label {
-            color: #636e72;
-            font-size: 0.9rem;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--text-main);
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-10px);
+        /* 手機版樣式修正 (@media query) */
+        @media (max-width: 768px) {
+            body { flex-direction: column; overflow-y: auto; height: auto; }
+            .sidebar {
+                width: 100%;
+                height: 250px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            .main-content { padding: 30px 15px; height: auto; }
+            .header h1 { font-size: 1.8rem; }
+            .input-box { padding: 15px; }
         }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
     </style>
 </head>
-
 <body>
 
     <div class="sidebar">
-        <h2>📊 ScoreFlow 紀錄</h2>
+        <h2>📊 成績紀錄</h2>
         <div id="scoreFeed" class="score-feed"></div>
     </div>
 
     <div class="main-content">
         <div class="header">
-            <h1>ScoreFlow Dashboard</h1>
-            <p style="color: #636e72;">即時數據分析儀表板</p>
+            <h1>ScoreFlow</h1>
+            <p style="color: #636e72;">行動化成績分析儀表板</p>
         </div>
 
         <div class="input-box">
-            <input type="text" id="subjectInput" placeholder="科目 (如: 數學)">
+            <input type="text" id="subjectInput" placeholder="科目">
             <input type="number" id="scoreInput" placeholder="分數" onkeypress="handleKeyPress(event)">
-            <button class="btn btn-add" onclick="addScore()">新增資料</button>
-            <button class="btn btn-stop" onclick="fetchReport()">產出分析報表</button>
-            <button class="btn" style="background: #27ae60; color: white;" onclick="downloadCSV()">匯出紀錄 (CSV)</button>
+            <button class="btn btn-add" onclick="addScore()">新增</button>
+            <button class="btn btn-stop" onclick="fetchReport()">分析</button>
+            <button class="btn btn-csv" onclick="downloadCSV()">匯出</button>
         </div>
 
         <div class="stats-grid" id="reportArea">
             <div class="stat-card">
-                <div class="stat-label">平均分數</div>
-                <div class="stat-value" id="avgVal">0.00</div>
+                <div class="stat-label">平均</div>
+                <div class="stat-value" id="avgVal">0</div>
             </div>
             <div class="stat-card" style="border-top-color: var(--accent);">
-                <div class="stat-label">最高分</div>
+                <div class="stat-label">最高</div>
                 <div class="stat-value" id="maxVal">0</div>
             </div>
             <div class="stat-card" style="border-top-color: #f1c40f;">
-                <div class="stat-label">總筆數</div>
+                <div class="stat-label">總數</div>
                 <div class="stat-value" id="countVal">0</div>
             </div>
             <div class="stat-card" style="border-top-color: #1abc9c;">
-                <div class="stat-label">及格率 (%)</div>
+                <div class="stat-label">及格率</div>
                 <div class="stat-value" id="passRateVal">0%</div>
             </div>
         </div>
     </div>
 
     <script>
-        let entries = []; // 儲存包含科目與分數的物件陣列
+        let entries = [];
 
         function handleKeyPress(e) { if (e.key === "Enter") addScore(); }
 
         function addScore() {
             const subInput = document.getElementById('subjectInput');
             const scInput = document.getElementById('scoreInput');
-            const subject = subInput.value.trim() || "未命名科目";
+            const subject = subInput.value.trim() || "未命名";
             const score = parseInt(scInput.value);
 
             if (!isNaN(score) && score >= 0 && score <= 100) {
-                // 將資料存入陣列，結構對應後端的 ScoreEntry
                 entries.push({ subject, score });
                 renderHistory(subject, score);
-
-                // 清空輸入框並聚焦回科目欄位
                 scInput.value = "";
                 subInput.value = "";
                 subInput.focus();
@@ -263,67 +206,48 @@
             const feed = document.getElementById('scoreFeed');
             const item = document.createElement('div');
             item.className = 'history-item';
+            item.style.animation = "slideIn 0.3s ease";
             item.innerHTML = `
-                <div>
-                    <small style="color:#bdc3c7">${subject}</small><br>
-                    <strong>${score}分</strong>
-                </div>
-                <span style="color: ${score < 60 ? '#ff7675' : '#55efc4'}">
-                    ${score < 60 ? '不及格' : '及格'}
-                </span>
+                <div><small>${subject}</small><br><strong>${score}分</strong></div>
+                <span style="color: ${score < 60 ? '#ff7675' : '#55efc4'}">${score < 60 ? '❌' : '✅'}</span>
             `;
             feed.prepend(item);
         }
 
         async function fetchReport() {
             if (entries.length === 0) return;
+            try {
+                const response = await fetch('/calculate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(entries)
+                });
+                const data = await response.json();
+                
+                document.getElementById('avgVal').innerText = data.avgScore.toFixed(1);
+                document.getElementById('maxVal').innerText = data.highestScore;
+                document.getElementById('countVal').innerText = data.totalCount;
+                document.getElementById('passRateVal').innerText = data.passRate.toFixed(0) + "%";
 
-            // 發送請求至後端 API
-            const response = await fetch('/calculate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(entries)
-            });
-            const data = await response.json();
-
-            // 更新報表數值
-            document.getElementById('avgVal').innerText = data.avgScore.toFixed(2);
-            document.getElementById('maxVal').innerText = data.highestScore;
-            document.getElementById('countVal').innerText = data.totalCount;
-            document.getElementById('passRateVal').innerText = data.passRate.toFixed(1) + "%";
-            document.getElementById('passRateVal').style.color = data.passRate >= 60 ? 'var(--accent)' : 'var(--danger)';
-
-            // 觸發漸進出現動畫
-            const reportArea = document.getElementById('reportArea');
-            reportArea.classList.add('show');
-
-            // 自動平滑捲動到報表卡片位置
-            setTimeout(() => {
+                const reportArea = document.getElementById('reportArea');
+                reportArea.classList.add('show');
                 reportArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
-        }
-        function downloadCSV() {
-            if (entries.length === 0) {
-                alert("目前還沒有輸入任何成績喔！");
-                return;
+            } catch (err) {
+                alert("連線失敗，請檢查網路或 API 是否正常。");
             }
+        }
 
-            // 加上 BOM 表頭防止 Excel 開啟中文亂碼
-            let csvContent = "\uFEFF科目,分數\n";
-            entries.forEach(e => {
-                csvContent += `${e.subject},${e.score}\n`;
-            });
-
+        function downloadCSV() {
+            if (entries.length === 0) return;
+            let csvContent = "\uFEFF科目,分數\n"; 
+            entries.forEach(e => { csvContent += `${e.subject},${e.score}\n`; });
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
-            link.setAttribute("href", url);
-            link.setAttribute("download", `ScoreFlow_成績報表_${new Date().toLocaleDateString()}.csv`);
-            document.body.appendChild(link);
+            link.href = url;
+            link.download = `成績報表_${new Date().toLocaleDateString()}.csv`;
             link.click();
-            document.body.removeChild(link);
         }
     </script>
 </body>
-
 </html>
