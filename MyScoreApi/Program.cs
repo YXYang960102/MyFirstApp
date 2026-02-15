@@ -8,17 +8,17 @@ builder.Services.AddCors(options => {
 });
 // --------------------------------
 
-builder.Services.AddOpenApi();
+// builder.Services.AddOpenApi();
 var app = builder.Build();
 
 app.UseCors(); // 啟用 CORS
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+// if (app.Environment.IsDevelopment())
+// {
+//     app.MapOpenApi();
+// }
 
 app.UseHttpsRedirection();
 
