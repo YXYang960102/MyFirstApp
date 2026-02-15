@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +15,12 @@
             --text-main: #2d3436;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
             background: var(--main-bg);
@@ -31,7 +37,7 @@
             display: flex;
             flex-direction: column;
             padding: 25px;
-            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
         }
 
         .sidebar h2 {
@@ -43,7 +49,8 @@
 
         .score-feed {
             flex: 1;
-            overflow-y: auto; /* 允許垂直捲動，防止破圖 */
+            overflow-y: auto;
+            /* 允許垂直捲動，防止破圖 */
             padding-right: 10px;
         }
 
@@ -72,15 +79,22 @@
             scroll-behavior: smooth;
         }
 
-        .header { text-align: center; }
-        .header h1 { font-size: 2.8rem; color: var(--primary); margin-bottom: 5px; }
+        .header {
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
 
         /* 輸入區域：支援科目與分數 */
         .input-box {
             background: white;
             padding: 30px;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
             display: grid;
             grid-template-columns: 1.5fr 1fr auto auto;
             gap: 12px;
@@ -97,7 +111,9 @@
             transition: 0.3s;
         }
 
-        input:focus { border-color: var(--primary); }
+        input:focus {
+            border-color: var(--primary);
+        }
 
         .btn {
             padding: 12px 25px;
@@ -108,9 +124,20 @@
             transition: 0.3s;
         }
 
-        .btn-add { background: var(--primary); color: white; }
-        .btn-stop { background: var(--danger); color: white; }
-        .btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        .btn-add {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-stop {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+        }
 
         /* 統計卡片漸進動畫 */
         .stats-grid {
@@ -119,8 +146,10 @@
             gap: 20px;
             width: 100%;
             max-width: 1000px;
-            opacity: 0; /* 預設隱藏 */
-            transform: translateY(30px); /* 下移 30px */
+            opacity: 0;
+            /* 預設隱藏 */
+            transform: translateY(30px);
+            /* 下移 30px */
             transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
             margin-bottom: 80px;
         }
@@ -139,15 +168,33 @@
             text-align: center;
         }
 
-        .stat-label { color: #636e72; font-size: 0.9rem; font-weight: bold; margin-bottom: 5px; }
-        .stat-value { font-size: 2rem; font-weight: 800; color: var(--text-main); }
+        .stat-label {
+            color: #636e72;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
 
         @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-10px); }
-            to { opacity: 1; transform: translateX(0); }
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
     </style>
 </head>
+
 <body>
 
     <div class="sidebar">
@@ -166,6 +213,7 @@
             <input type="number" id="scoreInput" placeholder="分數" onkeypress="handleKeyPress(event)">
             <button class="btn btn-add" onclick="addScore()">新增資料</button>
             <button class="btn btn-stop" onclick="fetchReport()">產出分析報表</button>
+            <button class="btn" style="background: #27ae60; color: white;" onclick="downloadCSV()">匯出紀錄 (CSV)</button>
         </div>
 
         <div class="stats-grid" id="reportArea">
@@ -201,9 +249,9 @@
 
             if (!isNaN(score) && score >= 0 && score <= 100) {
                 // 將資料存入陣列，結構對應後端的 ScoreEntry
-                entries.push({ subject, score }); 
+                entries.push({ subject, score });
                 renderHistory(subject, score);
-                
+
                 // 清空輸入框並聚焦回科目欄位
                 scInput.value = "";
                 subInput.value = "";
@@ -229,7 +277,7 @@
 
         async function fetchReport() {
             if (entries.length === 0) return;
-            
+
             // 發送請求至後端 API
             const response = await fetch('/calculate', {
                 method: 'POST',
@@ -237,7 +285,7 @@
                 body: JSON.stringify(entries)
             });
             const data = await response.json();
-            
+
             // 更新報表數值
             document.getElementById('avgVal').innerText = data.avgScore.toFixed(2);
             document.getElementById('maxVal').innerText = data.highestScore;
@@ -248,12 +296,34 @@
             // 觸發漸進出現動畫
             const reportArea = document.getElementById('reportArea');
             reportArea.classList.add('show');
-            
+
             // 自動平滑捲動到報表卡片位置
             setTimeout(() => {
                 reportArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 100);
         }
+        function downloadCSV() {
+            if (entries.length === 0) {
+                alert("目前還沒有輸入任何成績喔！");
+                return;
+            }
+
+            // 加上 BOM 表頭防止 Excel 開啟中文亂碼
+            let csvContent = "\uFEFF科目,分數\n";
+            entries.forEach(e => {
+                csvContent += `${e.subject},${e.score}\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `ScoreFlow_成績報表_${new Date().toLocaleDateString()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
     </script>
 </body>
+
 </html>

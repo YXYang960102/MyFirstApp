@@ -1,11 +1,17 @@
 using MyFirstApp; // 引用你的 Calculator 類別
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddOpenApi();
 
+// --- 加入這段：允許所有人存取 API ---
+builder.Services.AddCors(options => {
+    options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+});
+// --------------------------------
+
+builder.Services.AddOpenApi();
 var app = builder.Build();
 
-// 設定靜態檔案支援
+app.UseCors(); // 啟用 CORS
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
