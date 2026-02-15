@@ -10,12 +10,12 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("MyFirstApp")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("MyScoreApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2f941595d7a66ba9ea02997739059c0a5dc41bee")]
-[assembly: System.Reflection.AssemblyProductAttribute("MyFirstApp")]
-[assembly: System.Reflection.AssemblyTitleAttribute("MyFirstApp")]
+[assembly: System.Reflection.AssemblyProductAttribute("MyScoreApi")]
+[assembly: System.Reflection.AssemblyTitleAttribute("MyScoreApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
 
 // 由 MSBuild WriteCodeFragment 類別產生。

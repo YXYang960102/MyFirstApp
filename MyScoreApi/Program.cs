@@ -1,12 +1,14 @@
-var builder = WebApplication.CreateBuilder(args);
+using MyFirstApp; // 引用你的 Calculator 類別
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// 讓 API 支援讀取 index.html 檔案
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -14,28 +16,22 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
+// 當網頁按下「停止並計算」按鈕時，會呼叫這個 API
+app.MapPost("/calculate", (List<int> scores) =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    if (scores == null || scores.Count == 0)
+        return Results.BadRequest("No scores provided.");
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+    // 呼叫你原本寫好的大腦
+    double average = Calculator.GetAverage(scores);
+    int max = Calculator.GetMax(scores);
+
+    // 把結果打包成 JSON 回傳給網頁
+    return Results.Ok(new { 
+        avgScore = average, 
+        highestScore = max, 
+        totalCount = scores.Count 
+    });
+});
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

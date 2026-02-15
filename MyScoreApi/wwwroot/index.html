@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Score Pro - 專業儀表板</title>
+    <style>
+        :root {
+            --sidebar-bg: #2c3e50;
+            --main-bg: #f8f9fa;
+            --primary: #3498db;
+            --accent: #1abc9c;
+            --danger: #e74c3c;
+            --text-main: #2d3436;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--main-bg); display: flex; height: 100vh; overflow: hidden; }
+
+        /* 左側側邊欄：輸入歷史 */
+        .sidebar { width: 320px; background: var(--sidebar-bg); color: white; display: flex; flex-direction: column; padding: 25px; box-shadow: 4px 0 10px rgba(0,0,0,0.1); }
+        .sidebar h2 { font-size: 1.2rem; margin-bottom: 25px; color: #ecf0f1; border-bottom: 1px solid #34495e; padding-bottom: 10px; }
+        .score-feed { flex: 1; overflow-y: auto; list-style: none; padding-right: 5px; }
+        .score-feed::-webkit-scrollbar { width: 5px; }
+        .score-feed::-webkit-scrollbar-thumb { background: #455a64; border-radius: 10px; }
+        
+        .history-item { background: #34495e; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* 右側主面板 */
+        .main-content { flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { color: var(--text-main); font-size: 2rem; font-weight: 700; }
+
+        /* 統計卡片網格 */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .stat-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-top: 4px solid var(--primary); transition: transform 0.3s; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-label { color: #636e72; font-size: 0.9rem; text-transform: uppercase; margin-bottom: 5px; }
+        .stat-value { font-size: 1.8rem; font-weight: 800; color: var(--text-main); }
+
+        /* 輸入區域 */
+        .input-box { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: center; }
+        input { flex: 1; padding: 15px; border: 2px solid #dfe6e9; border-radius: 10px; font-size: 1rem; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--primary); }
+        
+        .btn { padding: 12px 25px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; transition: 0.3s; }
+        .btn-add { background: var(--primary); color: white; }
+        .btn-stop { background: var(--danger); color: white; }
+        .btn:hover { filter: brightness(1.1); }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>分數計算器</h2>
+        <div id="scoreFeed" class="score-feed">
+            </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>Score Pro Dashboard</h1>
+            <div id="status" style="color: var(--accent);">● 系統已連線</div>
+        </div>
+
+        <div class="input-box">
+            <input type="number" id="scoreInput" placeholder="輸入分數後按 Enter..." onkeypress="handleKeyPress(event)">
+            <button class="btn btn-add" onclick="addScore()">新增資料</button>
+            <button class="btn btn-stop" onclick="fetchReport()">停止並產出報表</button>
+        </div>
+
+        <div class="stats-grid" id="reportArea" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-label">平均分數</div>
+                <div class="stat-value" id="avgVal">0.00</div>
+            </div>
+            <div class="stat-card" style="border-top-color: var(--accent);">
+                <div class="stat-label">最高分</div>
+                <div class="stat-value" id="maxVal">0</div>
+            </div>
+            <div class="stat-card" style="border-top-color: #f1c40f;">
+                <div class="stat-label">總筆數</div>
+                <div class="stat-value" id="countVal">0</div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    let scores = [];
+
+    function handleKeyPress(e) { if (e.key === "Enter") addScore(); }
+
+    function addScore() {
+        const input = document.getElementById('scoreInput');
+        const val = parseInt(input.value);
+        if (!isNaN(val) && val >= 0 && val <= 100) {
+            scores.push(val);
+            renderHistory(val);
+            input.value = "";
+            input.focus();
+        }
+    }
+
+    function renderHistory(val) {
+        const feed = document.getElementById('scoreFeed');
+        const item = document.createElement('div');
+        item.className = 'history-item';
+        item.innerHTML = `<span>Score Added</span> <strong style="color: ${val < 60 ? '#ff7675' : '#55efc4'}">${val}</strong>`;
+        feed.prepend(item);
+    }
+
+    async function fetchReport() {
+        if (scores.length === 0) return;
+        // 呼叫你的 C# API
+        const response = await fetch('/calculate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(scores)
+        });
+        const data = await response.json();
+        
+        document.getElementById('reportArea').style.display = 'grid';
+        document.getElementById('avgVal').innerText = data.avgScore.toFixed(2);
+        document.getElementById('maxVal').innerText = data.highestScore;
+        document.getElementById('countVal').innerText = data.totalCount;
+    }
+</script>
+</body>
+</html>
