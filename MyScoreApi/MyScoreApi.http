@@ -1,0 +1,6 @@
+@MyScoreApi_HostAddress = http://localhost:5072
+
+GET {{MyScoreApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

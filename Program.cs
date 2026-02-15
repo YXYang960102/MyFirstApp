@@ -1,39 +1,69 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using MyFirstApp;
 
-
-Random random = new Random();
-int targetNumber = random.Next(1, 201);
-int guess = 0; 
-int count = 0; 
-
-Console.WriteLine("=== 歡迎來到猜數字遊戲 (1-200) ===");
-
-
-while (guess != targetNumber)
-{
-    Console.Write("請輸入你猜的數字：");
-    string input = Console.ReadLine();
-
-    if (!int.TryParse(input, out guess))
+partial class Program
+{   
+    static void Main()
     {
-        Console.WriteLine("❌ 請輸入有效的整數數字！");
-        continue;
+       // Start with some initial data
+       List<int> numbers = new List<int> { 85, 90, 78, 92, 88 };
+       
+       Console.WriteLine("=== Student Score System ===");
+       Console.WriteLine("Instructions: Enter a score (0-100) or type 's' to Stop and view report.");
+
+       while(true)
+        {
+            Console.Write("Enter score (or 's' to stop): ");
+            string input = Console.ReadLine();
+
+            // Check if the user wants to "push" the stop button
+            if (input.ToLower() == "s")
+            {
+                Console.WriteLine("Stopping input...");
+                break;
+            }
+
+            if(int.TryParse(input, out int score))
+            {
+                if(score < 0 || score > 100)
+                {
+                    Console.WriteLine("Error: Score must be between 0 and 100.");
+                    continue;
+                }
+                numbers.Add(score); // Add valid score to list
+            }
+            else
+            {
+                Console.WriteLine("Invalid input. Please enter a number or 's' to stop.");
+            }
+        }
+
+        // Generate the final report
+        DisplayReport(numbers);
     }
 
-    count++;
+    static void DisplayReport(List<int> scoreList)
+    {
+        if(scoreList.Count == 0)
+        {
+            Console.WriteLine("No scores to report."); // Handle empty list
+            return;
+        }
 
- 
-    if (guess > targetNumber)
-    {
-        Console.WriteLine("📉 太大了！再小一點。");
-    }
-    else if (guess < targetNumber)
-    {
-        Console.WriteLine("📈 太小了！再大一點。");
-    }
-    else
-    {
-        Console.WriteLine($"🎉 恭喜答對！答案就是 {targetNumber}。");
-        Console.WriteLine($"你總共猜了 {count} 次。");
+        // Use Calculator class for logic (Remember to fix the spelling in Calculator.cs!)
+        double average = Calculator.GetAverage(scoreList); 
+        int maxScore = scoreList.Max();
+        int minScore = scoreList.Min();
+
+        Console.WriteLine("\n====================");
+        Console.WriteLine("    FINAL REPORT    ");
+        Console.WriteLine("====================");
+        Console.WriteLine($"Total Records:  {scoreList.Count}");
+        Console.WriteLine($"Average Score:  {average:F2}");
+        Console.WriteLine($"Highest Score:  {maxScore}");
+        Console.WriteLine($"Lowest Score:   {minScore}");
+        Console.WriteLine("====================");
     }
 }
