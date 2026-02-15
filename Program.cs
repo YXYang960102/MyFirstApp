@@ -1,12 +1,12 @@
 ﻿using System;
 
-// 1. 產生隨機數
+
 Random random = new Random();
-int targetNumber = random.Next(1, 101);
+int targetNumber = random.Next(1, 201);
 int guess = 0; 
 int count = 0; 
 
-Console.WriteLine("=== 歡迎來到猜數字遊戲 (1-100) ===");
+Console.WriteLine("=== 歡迎來到猜數字遊戲 (1-200) ===");
 
 
 while (guess != targetNumber)
