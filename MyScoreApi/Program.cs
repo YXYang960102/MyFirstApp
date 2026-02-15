@@ -22,15 +22,20 @@ app.MapPost("/calculate", (List<int> scores) =>
     if (scores == null || scores.Count == 0)
         return Results.BadRequest("No scores provided.");
 
-    // 呼叫你原本寫好的大腦
+    // 呼叫原本的大腦
     double average = Calculator.GetAverage(scores);
     int max = Calculator.GetMax(scores);
+    
+    // 新增：計算及格率 (60分以上)
+    int passCount = scores.Count(s => s >= 60);
+    double passRate = (double)passCount / scores.Count * 100;
 
-    // 把結果打包成 JSON 回傳給網頁
+    // 這裡一定要把 passRate 傳回去！
     return Results.Ok(new { 
         avgScore = average, 
         highestScore = max, 
-        totalCount = scores.Count 
+        totalCount = scores.Count,
+        passRate = passRate 
     });
 });
 

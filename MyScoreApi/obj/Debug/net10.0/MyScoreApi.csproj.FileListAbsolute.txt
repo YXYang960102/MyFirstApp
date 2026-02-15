@@ -33,4 +33,4 @@
 /Users/jeremy/MyFirstApp/MyScoreApi/obj/Debug/net10.0/MyScoreApi.pdb
 /Users/jeremy/MyFirstApp/MyScoreApi/obj/Debug/net10.0/MyScoreApi.genruntimeconfig.cache
 /Users/jeremy/MyFirstApp/MyScoreApi/obj/Debug/net10.0/ref/MyScoreApi.dll
-/Users/jeremy/MyFirstApp/MyScoreApi/obj/Debug/net10.0/compressed/kgvbyic8ww-{0}-ztc1d2v42n-ztc1d2v42n.gz
+/Users/jeremy/MyFirstApp/MyScoreApi/obj/Debug/net10.0/compressed/kgvbyic8ww-{0}-9w615ye5h1-9w615ye5h1.gz
